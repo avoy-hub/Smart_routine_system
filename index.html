@@ -1,0 +1,1560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BAUST Automated & Manual Class Routine System</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- html2pdf.js for direct PDF download -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+    <style>
+        @media print {
+            .no-print { display: none !important; }
+            .print-area { width: 100% !important; margin: 0 !important; padding: 0 !important; }
+            body { background: white !important; color: black !important; }
+        }
+        .baust-grid th, .baust-grid td {
+            border: 1px solid #4b5563;
+            text-align: center;
+            vertical-align: middle;
+            padding: 6px;
+            font-size: 11px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen text-gray-800 font-sans">
+
+    <!-- Header Navigation -->
+    <header class="bg-indigo-900 text-white shadow-md no-print relative">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-3">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('your-routine')">
+                <!-- BAUST Official Circular Emblem Logo (Prominent & Clear Size) -->
+                <img src="data:image/jpeg;base64,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" alt="BAUST Official University Logo" class="w-20 h-20 sm:w-24 sm:h-24 object-contain bg-white rounded-full p-1.5 border-2 border-amber-400 shadow-md flex-shrink-0">
+                <div>
+                    <h1 class="text-base sm:text-xl font-bold tracking-wide">BAUST Routine Management System</h1>
+                </div>
+            </div>
+
+            <!-- Top Right Actions -->
+            <div class="flex items-center space-x-2">
+                <button onclick="switchTab('your-routine')" class="bg-indigo-800 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold transition flex items-center shadow border border-indigo-700">
+                    <i class="fa-solid fa-calendar-days mr-1.5 text-yellow-400"></i> Your Routine
+                </button>
+                <button onclick="protectedTabAccess('create-routine')" class="bg-indigo-800 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold transition flex items-center shadow border border-indigo-700">
+                    <i class="fa-solid fa-pen-to-square mr-1.5"></i> Create Routine <i class="fa-solid fa-lock text-[10px] ml-1 opacity-70"></i>
+                </button>
+                <button id="nav-logout-btn" onclick="confirmLogout()" class="hidden bg-rose-700 hover:bg-rose-800 text-white px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold transition flex items-center shadow">
+                    <i class="fa-solid fa-right-from-bracket mr-1.5"></i> Logout
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto p-4 sm:p-6">
+
+        <!-- Global Alert Box -->
+        <div id="alert-box" class="hidden mb-4 p-4 rounded-lg font-medium shadow text-white"></div>
+
+        <!-- TAB 1: YOUR ROUTINE (GRID CARD SYSTEM) -->
+        <section id="sec-your-routine" class="tab-content">
+            
+            <!-- Breadcrumb Navigation with Back Button on Left Side -->
+            <div id="grid-breadcrumb" class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-6 flex items-center space-x-4 no-print">
+                <button id="grid-back-btn" onclick="gridGoBack()" class="hidden bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center">
+                    <i class="fa-solid fa-arrow-left mr-1.5"></i> Back
+                </button>
+                <div class="flex items-center space-x-2 text-sm font-semibold text-gray-700" id="breadcrumb-text">
+                    <span class="text-indigo-900 flex items-center"><i class="fa-solid fa-house text-yellow-500 mr-2"></i> Select Department</span>
+                </div>
+            </div>
+
+            <!-- STEP 1: DEPARTMENT CARDS -->
+            <div id="dept-cards-container" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 no-print">
+                <!-- Javascript will dynamically build cards here -->
+            </div>
+
+            <!-- STEP 2: LEVEL-TERM CARDS -->
+            <div id="semester-cards-container" class="hidden grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 no-print">
+                <!-- Javascript will dynamically build cards here -->
+            </div>
+
+            <!-- STEP 3: SECTION CARDS (A / B / C) -->
+            <div id="section-cards-container" class="hidden grid grid-cols-3 gap-4 sm:gap-6 max-w-xl mx-auto no-print">
+                <!-- Javascript will dynamically build cards here -->
+            </div>
+
+            <!-- PUBLIC ROUTINE DISPLAY AREA -->
+            <div id="public-routine-container" class="hidden bg-white p-6 sm:p-8 rounded-xl shadow-sm border border-gray-300 print-area mt-6">
+                <!-- Class Routine Table or Error Msg will render here -->
+            </div>
+        </section>
+
+        <!-- TAB 2: CREATE ROUTINE (ADMIN WORKSPACE WITH HAMBURGER MENU) -->
+        <section id="sec-create-routine" class="tab-content hidden">
+            
+            <!-- Admin Header Bar -->
+            <div class="bg-indigo-900 text-white p-3 rounded-xl mb-6 shadow-sm no-print relative">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center space-x-2">
+                        <button onclick="switchTab('your-routine')" class="bg-indigo-800 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center border border-indigo-700">
+                            <i class="fa-solid fa-arrow-left mr-1.5"></i> Back
+                        </button>
+                        <button onclick="toggleAdminMenu()" class="text-white text-xs font-bold uppercase tracking-wider px-3 py-1.5 bg-indigo-800 hover:bg-indigo-700 rounded-lg focus:outline-none flex items-center space-x-2 transition border border-indigo-700">
+                            <i class="fa-solid fa-bars text-sm"></i>
+                            <span>Menu</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Hamburger Dropdown Menu -->
+                <div id="admin-hamburger-menu" class="hidden pt-3 mt-3 border-t border-indigo-800 space-y-1.5">
+                    <button onclick="switchAdminSubTab('teachers'); toggleAdminMenu();" id="m-subtab-teachers" class="admin-sub-btn w-full text-left px-3 py-2 rounded bg-indigo-800 text-xs font-semibold"><i class="fa-solid fa-chalkboard-user mr-2"></i> Teachers</button>
+                    <button onclick="switchAdminSubTab('rooms'); toggleAdminMenu();" id="m-subtab-rooms" class="admin-sub-btn w-full text-left px-3 py-2 rounded hover:bg-indigo-800 text-xs font-semibold"><i class="fa-solid fa-door-open mr-2"></i> Rooms & Labs</button>
+                    <button onclick="switchAdminSubTab('batches'); toggleAdminMenu();" id="m-subtab-batches" class="admin-sub-btn w-full text-left px-3 py-2 rounded hover:bg-indigo-800 text-xs font-semibold"><i class="fa-solid fa-users mr-2"></i> Dept & Batches</button>
+                    <button onclick="switchAdminSubTab('courses'); toggleAdminMenu();" id="m-subtab-courses" class="admin-sub-btn w-full text-left px-3 py-2 rounded hover:bg-indigo-800 text-xs font-semibold"><i class="fa-solid fa-book mr-2"></i> Courses</button>
+                    <button onclick="switchAdminSubTab('builder'); toggleAdminMenu();" id="m-subtab-builder" class="admin-sub-btn w-full text-left px-3 py-2 rounded hover:bg-indigo-800 text-xs font-semibold"><i class="fa-solid fa-calendar-plus mr-2"></i> Routine Builder</button>
+                </div>
+            </div>
+
+            <!-- ADMIN SUB-TAB 1: TEACHERS -->
+            <div id="admin-sub-teachers" class="admin-sub-content">
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
+                        <h2 class="text-lg font-bold mb-4 text-indigo-800 flex items-center" id="t-form-title"><i class="fa-solid fa-user-plus mr-2"></i> Add Teacher</h2>
+                        <form id="form-teacher" onsubmit="saveTeacher(event)" autocomplete="off" class="space-y-4">
+                            <input type="hidden" id="t-id">
+                            <div>
+                                <label class="block text-xs font-semibold uppercase text-gray-500 mb-1">Teacher Full Name</label>
+                                <input type="text" id="t-name" required autocomplete="off" placeholder="e.g. Dr. Tanvir Ahmed" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold uppercase text-gray-500 mb-1">Short Form (Code)</label>
+                                <input type="text" id="t-code" required autocomplete="off" placeholder="e.g. TA" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold uppercase text-gray-500 mb-1">Designation</label>
+                                <input type="text" id="t-designation" required autocomplete="off" placeholder="e.g. Professor, CSE" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold uppercase text-gray-500 mb-1">Department</label>
+                                <select id="t-dept" required autocomplete="off" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                                    <option value="CSE">CSE</option>
+                                    <option value="EEE">EEE</option>
+                                    <option value="ME">ME</option>
+                                    <option value="IPE">IPE</option>
+                                    <option value="CIVIL">CIVIL</option>
+                                    <option value="BBA">BBA</option>
+                                    <option value="Accounting">Accounting</option>
+                                    <option value="English">English</option>
+                                    <option value="A&S">Arts & Sciences (A&S)</option>
+                                </select>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button type="submit" id="t-submit-btn" class="flex-1 bg-indigo-700 text-white py-2.5 rounded-lg hover:bg-indigo-800 font-medium text-sm transition">Save Teacher</button>
+                                <button type="button" id="t-cancel-btn" onclick="resetTeacherForm()" class="hidden bg-gray-400 text-white px-3 py-2.5 rounded-lg hover:bg-gray-500 text-sm">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="md:col-span-2 bg-white p-5 rounded-xl shadow-sm border border-gray-200">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-lg font-bold text-gray-700">Teacher List (Draft)</h2>
+                            <button onclick="deleteAllTeachers()" class="bg-rose-600 hover:bg-rose-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow transition">Delete All</button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-gray-100 text-gray-600 uppercase text-xs">
+                                    <tr>
+                                        <th class="p-3">Code</th>
+                                        <th class="p-3">Name</th>
+                                        <th class="p-3">Designation</th>
+                                        <th class="p-3">Dept</th>
+                                        <th class="p-3 text-right">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="list-teachers" class="divide-y divide-gray-200"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ADMIN SUB-TAB 2: ROOMS -->
+            <div id="admin-sub-rooms" class="admin-sub-content hidden">
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
+                        <h2 class="text-lg font-bold mb-4 text-indigo-800 flex items-center" id="r-form-title"><i class="fa-solid fa-door-open mr-2"></i> Add Room / Lab</h2>
+                        <form id="form-room" onsubmit="saveRoom(event)" autocomplete="off" class="space-y-4">
+                            <input type="hidden" id="r-id">
+                            <div>
+                                <label class="block text-xs font-semibold uppercase text-gray-500 mb-1">Room No / Title</label>
+                                <input type="text" id="r-code" required autocomplete="off" placeholder="e.g. 308, Database Lab" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold uppercase text-gray-500 mb-1">Room Type</label>
+                                <select id="r-type" autocomplete="off" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                                    <option value="Theory">Theory Classroom Only</option>
+                                    <option value="Lab">Sessional / Lab Only</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold uppercase text-gray-500 mb-1">Department Tag</label>
+                                <select id="r-dept" autocomplete="off" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                                    <option value="CSE">CSE</option>
+                                    <option value="EEE">EEE</option>
+                                    <option value="ME">ME</option>
+                                    <option value="IPE">IPE</option>
+                                    <option value="CIVIL">CIVIL</option>
+                                    <option value="BBA">BBA</option>
+                                    <option value="Accounting">Accounting</option>
+                                    <option value="English">English</option>
+                                    <option value="COMMON">Common / General</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold uppercase text-gray-500 mb-1">Room Capacity</label>
+                                <input type="number" id="r-capacity" required autocomplete="off" value="50" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            </div>
+                            <div class="flex space-x-2">
+                                <button type="submit" id="r-submit-btn" class="flex-1 bg-indigo-700 text-white py-2.5 rounded-lg hover:bg-indigo-800 font-medium text-sm transition">Save Room</button>
+                                <button type="button" id="r-cancel-btn" onclick="resetRoomForm()" class="hidden bg-gray-400 text-white px-3 py-2.5 rounded-lg hover:bg-gray-500 text-sm">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="md:col-span-2 bg-white p-5 rounded-xl shadow-sm border border-gray-200">
+                        <h2 class="text-lg font-bold mb-4 text-gray-700">Classrooms & Labs List</h2>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-gray-100 text-gray-600 uppercase text-xs">
+                                    <tr>
+                                        <th class="p-3">Room / Lab</th>
+                                        <th class="p-3">Type</th>
+                                        <th class="p-3">Dept</th>
+                                        <th class="p-3">Capacity</th>
+                                        <th class="p-3 text-right">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="list-rooms" class="divide-y divide-gray-200"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ADMIN SUB-TAB 3: BATCHES & SEMESTERS -->
+            <div id="admin-sub-batches" class="admin-sub-content hidden">
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
+                        <h2 class="text-lg font-bold mb-4 text-indigo-800 flex items-center" id="b-form-title"><i class="fa-solid fa-users mr-2"></i> Add Batch Section & Semester</h2>
+                        <form id="form-batch" onsubmit="saveBatch(event)" autocomplete="off" class="space-y-4">
+                            <input type="hidden" id="b-id">
+                            <div>
+                                <label class="block text-xs font-semibold uppercase text-gray-500 mb-1">Department</label>
+                                <select id="b-dept" required autocomplete="off" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                                    <option value="CSE">CSE</option>
+                                    <option value="EEE">EEE</option>
+                                    <option value="ME">ME</option>
+                                    <option value="IPE">IPE</option>
+                                    <option value="CIVIL">CIVIL</option>
+                                    <option value="BBA">BBA</option>
+                                    <option value="Accounting">Accounting</option>
+                                    <option value="English">English</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold uppercase text-gray-500 mb-1">Level-Term (Semester)</label>
+                                <select id="b-lt" required autocomplete="off" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                                    <option value="Level 1 Term I">Level 1 Term I</option>
+                                    <option value="Level 1 Term II">Level 1 Term II</option>
+                                    <option value="Level 2 Term I">Level 2 Term I</option>
+                                    <option value="Level 2 Term II">Level 2 Term II</option>
+                                    <option value="Level 3 Term I">Level 3 Term I</option>
+                                    <option value="Level 3 Term II">Level 3 Term II</option>
+                                    <option value="Level 4 Term I">Level 4 Term I</option>
+                                    <option value="Level 4 Term II">Level 4 Term II</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold uppercase text-gray-500 mb-1">Batch Title</label>
+                                <input type="text" id="b-name" required autocomplete="off" placeholder="e.g. Batch 11" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold uppercase text-gray-500 mb-1">Section Name (A, B, C)</label>
+                                <select id="b-section" required autocomplete="off" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                                    <option value="Section A">Section A</option>
+                                    <option value="Section B">Section B</option>
+                                    <option value="Section C">Section C</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold uppercase text-gray-500 mb-1">Student Capacity</label>
+                                <input type="number" id="b-capacity" required autocomplete="off" value="40" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            </div>
+                            <div class="flex space-x-2">
+                                <button type="submit" id="b-submit-btn" class="flex-1 bg-indigo-700 text-white py-2.5 rounded-lg hover:bg-indigo-800 font-medium text-sm transition">Save Batch</button>
+                                <button type="button" id="b-cancel-btn" onclick="resetBatchForm()" class="hidden bg-gray-400 text-white px-3 py-2.5 rounded-lg hover:bg-gray-500 text-sm">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="md:col-span-2 bg-white p-5 rounded-xl shadow-sm border border-gray-200">
+                        <h2 class="text-lg font-bold mb-4 text-gray-700">Departments & Batch Sections List</h2>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-gray-100 text-gray-600 uppercase text-xs">
+                                    <tr>
+                                        <th class="p-3">Dept</th>
+                                        <th class="p-3">Semester</th>
+                                        <th class="p-3">Batch</th>
+                                        <th class="p-3">Section</th>
+                                        <th class="p-3">Students</th>
+                                        <th class="p-3 text-right">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="list-batches" class="divide-y divide-gray-200"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ADMIN SUB-TAB 4: COURSES -->
+            <div id="admin-sub-courses" class="admin-sub-content hidden">
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
+                        <h2 class="text-lg font-bold mb-4 text-indigo-800 flex items-center" id="c-form-title"><i class="fa-solid fa-book mr-2"></i> Add Course / Lab</h2>
+                        <form id="form-course" onsubmit="saveCourse(event)" autocomplete="off" class="space-y-4">
+                            <input type="hidden" id="c-id">
+                            <div>
+                                <label class="block text-xs font-semibold uppercase text-gray-500 mb-1">Department</label>
+                                <select id="c-dept" onchange="updateCourseBatchDropdown()" autocomplete="off" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                                    <option value="CSE">CSE</option>
+                                    <option value="EEE">EEE</option>
+                                    <option value="ME">ME</option>
+                                    <option value="IPE">IPE</option>
+                                    <option value="CIVIL">CIVIL</option>
+                                    <option value="BBA">BBA</option>
+                                    <option value="Accounting">Accounting</option>
+                                    <option value="English">English</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold uppercase text-gray-500 mb-1">Course No.</label>
+                                <input type="text" id="c-code" required autocomplete="off" placeholder="e.g. CSE 2201" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold uppercase text-gray-500 mb-1">Course Title</label>
+                                <input type="text" id="c-title" required autocomplete="off" placeholder="e.g. Data Structures II" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold uppercase text-gray-500 mb-1">Credit Hours</label>
+                                <select id="c-credit" onchange="autoAdjustCourseType()" autocomplete="off" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                                    <option value="3.0">3.0 Credit (Theory)</option>
+                                    <option value="2.0">2.0 Credit (Theory)</option>
+                                    <option value="1.5">1.5 Credit (Lab/Sessional)</option>
+                                    <option value="0.75">0.75 Credit (Lab/Sessional)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold uppercase text-gray-500 mb-1">Class Type</label>
+                                <select id="c-type" autocomplete="off" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                                    <option value="Theory">Theory Class</option>
+                                    <option value="Sessional">Sessional / Lab Class</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold uppercase text-gray-500 mb-1">Target Batch Section</label>
+                                <select id="c-batch" required autocomplete="off" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                                    <!-- Populated dynamically -->
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold uppercase text-gray-500 mb-1">Assigned Teacher(s)</label>
+                                <div id="teacher-checkboxes" class="max-h-32 overflow-y-auto border border-gray-300 rounded-lg p-2 space-y-1 bg-gray-50">
+                                    <!-- Populated dynamically -->
+                                </div>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button type="submit" id="c-submit-btn" class="flex-1 bg-indigo-700 text-white py-2.5 rounded-lg hover:bg-indigo-800 font-medium text-sm transition">Save Course</button>
+                                <button type="button" id="c-cancel-btn" onclick="resetCourseForm()" class="hidden bg-gray-400 text-white px-3 py-2.5 rounded-lg hover:bg-gray-500 text-sm">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="md:col-span-2 bg-white p-5 rounded-xl shadow-sm border border-gray-200">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-lg font-bold text-gray-700">Course List</h2>
+                            <button onclick="deleteAllCourses()" class="bg-rose-600 hover:bg-rose-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow transition">Delete All</button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-gray-100 text-gray-600 uppercase text-xs">
+                                    <tr>
+                                        <th class="p-3">Code</th>
+                                        <th class="p-3">Title</th>
+                                        <th class="p-3">Credit</th>
+                                        <th class="p-3">Type</th>
+                                        <th class="p-3">Section</th>
+                                        <th class="p-3">Teachers</th>
+                                        <th class="p-3 text-right">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="list-courses" class="divide-y divide-gray-200"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ADMIN SUB-TAB 5: ROUTINE BUILDER -->
+            <div id="admin-sub-builder" class="admin-sub-content hidden">
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 mb-6">
+                    <div class="flex justify-between items-center flex-wrap gap-2 mb-3">
+                        <h3 class="text-base font-bold text-indigo-900 flex items-center">
+                            <i class="fa-solid fa-filter text-yellow-500 mr-2"></i> Select Section to Build Draft Routine
+                        </h3>
+                        <!-- PUBLISH BUTTON (ONLY IN ROUTINE BUILDER) -->
+                        <button onclick="publishRoutineToCloud()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-lg text-xs font-bold shadow transition flex items-center">
+                            <i class="fa-solid fa-cloud-arrow-up mr-1.5"></i> Publish
+                        </button>
+                    </div>
+                    <div class="grid sm:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">Select Department:</label>
+                            <select id="builder-dept" onchange="onBuilderDeptChange()" autocomplete="off" class="w-full border border-gray-300 rounded-lg p-2 text-sm outline-none">
+                                <option value="CSE">CSE</option>
+                                <option value="EEE">EEE</option>
+                                <option value="ME">ME</option>
+                                <option value="IPE">IPE</option>
+                                <option value="CIVIL">CIVIL</option>
+                                <option value="BBA">BBA</option>
+                                <option value="Accounting">Accounting</option>
+                                <option value="English">English</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">Select Batch Section:</label>
+                            <select id="builder-batch" onchange="renderAdminBuilderRoutine()" autocomplete="off" class="w-full border border-gray-300 rounded-lg p-2 text-sm outline-none">
+                                <!-- Populated dynamically -->
+                            </select>
+                        </div>
+                        <div class="flex items-end">
+                            <button onclick="clearBatchRoutine()" class="w-full bg-rose-600 hover:bg-rose-700 text-white px-3 py-2 rounded-lg text-sm font-semibold shadow transition">
+                                <i class="fa-solid fa-trash-can mr-1"></i> Clear Routine
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Assigner Drawer -->
+                <div class="bg-indigo-50 border border-indigo-200 p-5 rounded-xl shadow-sm mb-6">
+                    <h3 class="text-sm font-bold text-indigo-900 mb-3 flex items-center">
+                        <i class="fa-solid fa-plus-circle text-indigo-600 mr-2"></i> Assign Class in Routine Slot
+                    </h3>
+                    <div class="grid md:grid-cols-5 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">Select Day:</label>
+                            <select id="assign-day" autocomplete="off" class="w-full border border-gray-300 rounded-lg p-2 text-xs bg-white">
+                                <option value="Sun">Sunday</option>
+                                <option value="Mon">Monday</option>
+                                <option value="Tue">Tuesday</option>
+                                <option value="Wed">Wednesday</option>
+                                <option value="Thu">Thursday</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">Select Time Slot:</label>
+                            <select id="assign-slot" autocomplete="off" class="w-full border border-gray-300 rounded-lg p-2 text-xs bg-white">
+                                <option value="0">08:00 AM - 08:55 AM (Theory)</option>
+                                <option value="1">09:00 AM - 09:55 AM (Theory)</option>
+                                <option value="2">10:00 AM - 10:55 AM (Theory)</option>
+                                <option value="LAB_MORNING">08:00 AM - 10:55 AM (Morning Lab Block)</option>
+                                <option value="4">11:30 AM - 12:25 PM (Theory)</option>
+                                <option value="5">12:30 PM - 01:25 PM (Theory)</option>
+                                <option value="6">01:30 PM - 02:25 PM (Theory)</option>
+                                <option value="LAB_AFTERNOON">11:30 AM - 02:20 PM (Afternoon Lab Block)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">Select Course:</label>
+                            <select id="assign-course" autocomplete="off" class="w-full border border-gray-300 rounded-lg p-2 text-xs bg-white">
+                                <!-- Populated dynamically -->
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">Select Room / Lab:</label>
+                            <select id="assign-room" autocomplete="off" class="w-full border border-gray-300 rounded-lg p-2 text-xs bg-white">
+                                <!-- Populated dynamically -->
+                            </select>
+                        </div>
+                        <div class="flex items-end">
+                            <button onclick="manualAssignSlot()" class="w-full bg-indigo-700 hover:bg-indigo-800 text-white font-bold p-2 text-xs rounded-lg transition shadow">
+                                Assign Class
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin Builder Routine Preview -->
+                <div id="admin-routine-container" class="bg-white p-8 rounded-xl shadow-sm border border-gray-300">
+                    <div class="text-center py-10 text-gray-400">
+                        <p class="text-lg">Select Department and Section above to view and edit draft routine.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ADMIN AUTHENTICATION MODAL -->
+    <div id="admin-auth-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 relative">
+            <button onclick="closeAdminModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            <div class="text-center mb-6">
+                <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <i class="fa-solid fa-user-shield text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800">Create Routine Access</h3>
+                <p class="text-sm text-gray-500 mt-1">Please enter admin credentials to proceed.</p>
+            </div>
+            <form onsubmit="handleAdminLogin(event)" autocomplete="off" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Admin Email</label>
+                    <input type="email" id="admin-email" required autocomplete="off" placeholder="avoy.baust@gmail.com" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Password</label>
+                    <input type="password" id="admin-password" required autocomplete="off" placeholder="••••••••" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-sm">
+                </div>
+                <div id="login-error-msg" class="hidden text-red-500 text-xs text-center font-semibold">
+                    Invalid Admin Credentials!
+                </div>
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 rounded-lg shadow transition text-sm">
+                    Authenticate & Access
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- LOGOUT CONFIRMATION MODAL -->
+    <div id="logout-confirm-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center relative">
+            <div class="w-12 h-12 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                <i class="fa-solid fa-triangle-exclamation text-xl"></i>
+            </div>
+            <h3 class="text-lg font-bold text-gray-800 mb-2">Confirm Logout</h3>
+            <p class="text-sm text-gray-600 mb-6">Are you sure you want to log out?</p>
+            <div class="flex space-x-3">
+                <button onclick="executeLogout(true)" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-semibold py-2 rounded-lg text-sm transition shadow">Yes</button>
+                <button onclick="executeLogout(false)" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 rounded-lg text-sm transition">No</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 1. FIREBASE INITIALIZATION SETUP
+        const firebaseConfig = {
+          apiKey: "AIzaSyDhvsiv0wehiFHHjlYDIZTv0VJlPsMzs9Y",
+          authDomain: "smart-routine-system-86b40.firebaseapp.com",
+          databaseURL: "https://smart-routine-system-86b40-default-rtdb.firebaseio.com",
+          projectId: "smart-routine-system-86b40",
+          storageBucket: "smart-routine-system-86b40.firebasestorage.app",
+          messagingSenderId: "146211242811",
+          appId: "1:146211242811:web:63aecececa788e066aad1e",
+          measurementId: "G-HFFPZNQQ4B"
+        };
+   
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.database();
+
+        let isAdminLoggedIn = false;
+        let pendingTab = null;
+
+        let teachers = [];
+        let rooms = [];
+        let batches = [];
+        let courses = [];
+        let routineMap = {};
+        let publishedRoutineMap = {};
+
+        // DRILL DOWN NAVIGATION STATE
+        let selectedDept = null;
+        let selectedSemester = null;
+        let selectedSection = null;
+
+        const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu'];
+        const SLOTS = [
+            { id: 0, label: '08.00 AM - 08.55 AM' },
+            { id: 1, label: '09.00 AM - 09.55 AM' },
+            { id: 2, label: '10.00 AM - 10.55 AM' },
+            { id: 3, label: '10.55 AM - 11.30 AM', isBreak: true },
+            { id: 4, label: '11.30 AM - 12.25 PM' },
+            { id: 5, label: '12.30 PM - 01.25 PM' },
+            { id: 6, label: '01.30 PM - 02.25 PM' }
+        ];
+
+        // Specific Department Logos & Icons
+        const DEFAULT_DEPTS = [
+            { name: "CSE", icon: "fa-laptop-code", color: "text-blue-600" },
+            { name: "EEE", icon: "fa-microchip", color: "text-amber-500" },
+            { name: "ME", icon: "fa-gears", color: "text-emerald-600" },
+            { name: "IPE", icon: "fa-industry", color: "text-purple-600" },
+            { name: "CIVIL", icon: "fa-building-columns", color: "text-orange-600" },
+            { name: "BBA", icon: "fa-chart-pie", color: "text-pink-600" },
+            { name: "Accounting", icon: "fa-calculator", color: "text-teal-600" },
+            { name: "English", icon: "fa-book-open-reader", color: "text-indigo-600" }
+        ];
+
+        const DEFAULT_SEMESTERS = [
+            "Level 1 Term I", "Level 1 Term II",
+            "Level 2 Term I", "Level 2 Term II",
+            "Level 3 Term I", "Level 3 Term II",
+            "Level 4 Term I", "Level 4 Term II"
+        ];
+
+        const DEFAULT_SECTIONS = ["Section A", "Section B", "Section C"];
+
+        function initializeDefaultBatches() {
+            if (batches.length === 0) {
+                let idCounter = 1;
+                DEFAULT_DEPTS.forEach(d => {
+                    DEFAULT_SEMESTERS.forEach(sem => {
+                        DEFAULT_SECTIONS.forEach(sec => {
+                            batches.push({
+                                id: `b_default_${idCounter++}`,
+                                dept: d.name,
+                                lt: sem,
+                                name: `${d.name} Batch`,
+                                section: sec,
+                                capacity: 40
+                            });
+                        });
+                    });
+                });
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadLocalDraft();
+
+            if (localStorage.getItem('baust_admin_logged_in') === 'true') {
+                isAdminLoggedIn = true;
+                document.getElementById('nav-logout-btn').classList.remove('hidden');
+            }
+
+            db.ref('baust_v2_data/publishedRoutineMap').on('value', (snapshot) => {
+                publishedRoutineMap = snapshot.val() || {};
+                if (selectedDept && selectedSemester && selectedSection) {
+                    renderRoutineView();
+                }
+            });
+
+            switchTab('your-routine');
+        });
+
+        function toggleAdminMenu() {
+            document.getElementById('admin-hamburger-menu').classList.toggle('hidden');
+        }
+
+        function protectedTabAccess(tabName) {
+            if (isAdminLoggedIn) {
+                switchTab(tabName);
+            } else {
+                pendingTab = tabName;
+                document.getElementById('admin-auth-modal').classList.remove('hidden');
+            }
+        }
+
+        function closeAdminModal() {
+            document.getElementById('admin-auth-modal').classList.add('hidden');
+            document.getElementById('login-error-msg').classList.add('hidden');
+            pendingTab = null;
+        }
+
+        function handleAdminLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('admin-email').value.trim();
+            const password = document.getElementById('admin-password').value.trim();
+
+            if (email === "avoy.baust@gmail.com" && password === "bolbona") {
+                isAdminLoggedIn = true;
+                localStorage.setItem('baust_admin_logged_in', 'true');
+                closeAdminModal();
+                showAlert('Admin authenticated successfully!', 'success');
+                document.getElementById('nav-logout-btn').classList.remove('hidden');
+
+                if (pendingTab) {
+                    switchTab(pendingTab);
+                } else {
+                    switchTab('create-routine');
+                }
+            } else {
+                document.getElementById('login-error-msg').classList.remove('hidden');
+            }
+        }
+
+        function confirmLogout() {
+            document.getElementById('logout-confirm-modal').classList.remove('hidden');
+        }
+
+        function executeLogout(choice) {
+            document.getElementById('logout-confirm-modal').classList.add('hidden');
+            if (choice) {
+                isAdminLoggedIn = false;
+                localStorage.removeItem('baust_admin_logged_in');
+                document.getElementById('nav-logout-btn').classList.add('hidden');
+                switchTab('your-routine');
+                showAlert('Logged out successfully! Password required to access Create Routine.', 'error');
+            }
+        }
+
+        function loadLocalDraft() {
+            const localData = localStorage.getItem('baust_admin_draft');
+            if (localData) {
+                const parsed = JSON.parse(localData);
+                teachers = parsed.teachers || [];
+                rooms = parsed.rooms || [];
+                batches = parsed.batches || [];
+                courses = parsed.courses || [];
+                routineMap = parsed.routineMap || {};
+            }
+            initializeDefaultBatches();
+            renderTeachers();
+            renderRooms();
+            renderBatches();
+            renderCourses();
+            updateAllDropdowns();
+        }
+
+        function saveLocalDraft() {
+            if (isAdminLoggedIn) {
+                const draft = { teachers, rooms, batches, courses, routineMap };
+                localStorage.setItem('baust_admin_draft', JSON.stringify(draft));
+            }
+        }
+
+        function publishRoutineToCloud() {
+            if (!isAdminLoggedIn) return;
+            db.ref('baust_v2_data/publishedRoutineMap').set(routineMap)
+                .then(() => {
+                    showAlert('Routine published to cloud successfully! Visible in Your Routine.', 'success');
+                })
+                .catch(err => {
+                    showAlert('Failed to publish routine.', 'error');
+                });
+        }
+
+        function showAlert(msg, type = 'success') {
+            const box = document.getElementById('alert-box');
+            box.className = `mb-4 p-4 rounded-lg font-medium shadow text-white ${type === 'success' ? 'bg-emerald-600' : 'bg-rose-600'}`;
+            box.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-circle-check' : 'fa-triangle-exclamation'} mr-2"></i> ${msg}`;
+            box.classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            setTimeout(() => box.classList.add('hidden'), 5000);
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`sec-${tabName}`).classList.remove('hidden');
+
+            if(tabName === 'your-routine') {
+                resetGridToStep1();
+            }
+            if(tabName === 'create-routine') {
+                switchAdminSubTab('teachers');
+            }
+        }
+
+        function switchAdminSubTab(subName) {
+            document.querySelectorAll('.admin-sub-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.admin-sub-btn').forEach(el => el.classList.remove('bg-indigo-700'));
+            
+            document.getElementById(`admin-sub-${subName}`).classList.remove('hidden');
+            const mSubBtn = document.getElementById(`m-subtab-${subName}`);
+            if(mSubBtn) mSubBtn.classList.add('bg-indigo-700');
+
+            if(subName === 'courses') updateCourseBatchDropdown();
+            if(subName === 'builder') onBuilderDeptChange();
+        }
+
+        // ================= YOUR ROUTINE GRID DRILL-DOWN LOGIC =================
+
+        function resetGridToStep1() {
+            selectedDept = null;
+            selectedSemester = null;
+            selectedSection = null;
+
+            document.getElementById('dept-cards-container').classList.remove('hidden');
+            document.getElementById('semester-cards-container').classList.add('hidden');
+            document.getElementById('section-cards-container').classList.add('hidden');
+            document.getElementById('public-routine-container').classList.add('hidden');
+            document.getElementById('grid-back-btn').classList.add('hidden');
+
+            document.getElementById('breadcrumb-text').innerHTML = `
+                <span class="text-indigo-900 flex items-center"><i class="fa-solid fa-house text-yellow-500 mr-2"></i> Select Department</span>
+            `;
+
+            renderDeptCards();
+        }
+
+        function renderDeptCards() {
+            const container = document.getElementById('dept-cards-container');
+            container.innerHTML = DEFAULT_DEPTS.map(d => `
+                <div onclick="selectDept('${d.name}')" class="bg-white p-6 sm:p-8 rounded-2xl shadow-sm hover:shadow-md border border-gray-200 hover:border-indigo-500 transition-all cursor-pointer text-center group transform hover:-translate-y-1">
+                    <div class="w-16 h-16 sm:w-20 sm:h-20 bg-indigo-50 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-indigo-600 transition-all">
+                        <i class="fa-solid ${d.icon} text-3xl sm:text-4xl ${d.color} group-hover:text-white transition-all"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-800 group-hover:text-indigo-900">${d.name}</h3>
+                    <p class="text-xs text-gray-500 mt-1">Department</p>
+                </div>
+            `).join('');
+        }
+
+        function selectDept(deptName) {
+            selectedDept = deptName;
+            document.getElementById('dept-cards-container').classList.add('hidden');
+            document.getElementById('semester-cards-container').classList.remove('hidden');
+            document.getElementById('grid-back-btn').classList.remove('hidden');
+
+            document.getElementById('breadcrumb-text').innerHTML = `
+                <span onclick="resetGridToStep1()" class="text-indigo-600 hover:underline cursor-pointer">Department (${selectedDept})</span>
+                <i class="fa-solid fa-chevron-right text-xs text-gray-400 mx-1"></i>
+                <span class="text-indigo-900">Select Level-Term</span>
+            `;
+
+            renderSemesterCards();
+        }
+
+        function renderSemesterCards() {
+            const container = document.getElementById('semester-cards-container');
+            container.innerHTML = DEFAULT_SEMESTERS.map(sem => `
+                <div onclick="selectSemester('${sem}')" class="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md border border-gray-200 hover:border-indigo-500 transition-all cursor-pointer text-center group transform hover:-translate-y-1">
+                    <div class="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:bg-indigo-600 transition-all">
+                        <i class="fa-solid fa-graduation-cap text-2xl text-indigo-600 group-hover:text-white transition-all"></i>
+                    </div>
+                    <h4 class="text-sm font-bold text-gray-800 group-hover:text-indigo-900">${sem}</h4>
+                </div>
+            `).join('');
+        }
+
+        function selectSemester(sem) {
+            selectedSemester = sem;
+            document.getElementById('semester-cards-container').classList.add('hidden');
+            document.getElementById('section-cards-container').classList.remove('hidden');
+
+            document.getElementById('breadcrumb-text').innerHTML = `
+                <span onclick="resetGridToStep1()" class="text-indigo-600 hover:underline cursor-pointer">Dept (${selectedDept})</span>
+                <i class="fa-solid fa-chevron-right text-xs text-gray-400 mx-1"></i>
+                <span onclick="selectDept('${selectedDept}')" class="text-indigo-600 hover:underline cursor-pointer">${selectedSemester}</span>
+                <i class="fa-solid fa-chevron-right text-xs text-gray-400 mx-1"></i>
+                <span class="text-indigo-900">Select Section</span>
+            `;
+
+            renderSectionCards();
+        }
+
+        function renderSectionCards() {
+            const container = document.getElementById('section-cards-container');
+            container.innerHTML = DEFAULT_SECTIONS.map(sec => `
+                <div onclick="selectSection('${sec}')" class="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md border border-gray-200 hover:border-indigo-500 transition-all cursor-pointer text-center group transform hover:-translate-y-1">
+                    <div class="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:bg-amber-500 transition-all">
+                        <i class="fa-solid fa-users text-2xl text-amber-600 group-hover:text-white transition-all"></i>
+                    </div>
+                    <h4 class="text-base font-bold text-gray-800 group-hover:text-indigo-900">${sec}</h4>
+                </div>
+            `).join('');
+        }
+
+        function selectSection(sec) {
+            selectedSection = sec;
+            document.getElementById('section-cards-container').classList.add('hidden');
+            document.getElementById('public-routine-container').classList.remove('hidden');
+
+            document.getElementById('breadcrumb-text').innerHTML = `
+                <span onclick="resetGridToStep1()" class="text-indigo-600 hover:underline cursor-pointer">Dept (${selectedDept})</span>
+                <i class="fa-solid fa-chevron-right text-xs text-gray-400 mx-1"></i>
+                <span onclick="selectDept('${selectedDept}')" class="text-indigo-600 hover:underline cursor-pointer">${selectedSemester}</span>
+                <i class="fa-solid fa-chevron-right text-xs text-gray-400 mx-1"></i>
+                <span class="text-indigo-900">${selectedSection}</span>
+            `;
+
+            renderRoutineView();
+        }
+
+        function gridGoBack() {
+            if (selectedSection) {
+                selectedSection = null;
+                document.getElementById('public-routine-container').classList.add('hidden');
+                document.getElementById('section-cards-container').classList.remove('hidden');
+                selectSemester(selectedSemester);
+            } else if (selectedSemester) {
+                selectedSemester = null;
+                document.getElementById('section-cards-container').classList.add('hidden');
+                document.getElementById('semester-cards-container').classList.remove('hidden');
+                selectDept(selectedDept);
+            } else if (selectedDept) {
+                resetGridToStep1();
+            }
+        }
+
+        function renderRoutineView() {
+            const container = document.getElementById('public-routine-container');
+            
+            let batch = batches.find(b => b.dept === selectedDept && b.lt === selectedSemester && b.section === selectedSection);
+            let batchId = batch ? batch.id : null;
+            let batchRoutine = (batchId && publishedRoutineMap[batchId]) ? publishedRoutineMap[batchId] : {};
+            let hasClasses = Object.keys(batchRoutine).length > 0;
+
+            if (!batch || !hasClasses) {
+                container.innerHTML = `
+                    <div class="text-center py-16 bg-white rounded-xl">
+                        <div class="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl shadow-sm">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Routine Not Published Yet!</h3>
+                        <p class="text-gray-500 text-sm max-w-md mx-auto mb-6">
+                            Class routine for Department of <span class="font-semibold text-indigo-700">${selectedDept}</span> (${selectedSemester} - <span class="font-semibold text-indigo-700">${selectedSection}</span>) has not been generated or published by the authority yet.
+                        </p>
+                        <button onclick="gridGoBack()" class="bg-indigo-700 hover:bg-indigo-800 text-white text-xs font-bold px-4 py-2 rounded-lg transition shadow">
+                            <i class="fa-solid fa-arrow-left mr-1"></i> Choose Another Section
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = `
+                <div class="flex flex-wrap justify-between items-center mb-6 no-print bg-indigo-50 p-4 rounded-xl">
+                    <div>
+                        <h3 class="text-base font-bold text-indigo-900">${batch.dept} - ${batch.lt} (${batch.section})</h3>
+                        <p class="text-xs text-gray-600">Official Class Timetable</p>
+                    </div>
+                    <div class="flex space-x-2 mt-2 sm:mt-0">
+                        <button onclick="window.print()" class="bg-gray-800 text-white px-3 py-2 rounded-lg text-xs hover:bg-gray-900 font-semibold flex items-center"><i class="fa-solid fa-print mr-1"></i> Print</button>
+                        <button onclick="downloadRoutinePDF()" class="bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs hover:bg-emerald-800 font-semibold flex items-center"><i class="fa-solid fa-file-pdf mr-1"></i> Download PDF</button>
+                    </div>
+                </div>
+
+                <div class="text-center mb-6">
+                    <img src="data:image/jpeg;base64,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" alt="BAUST Official University Logo" class="w-24 h-24 object-contain mx-auto mb-3 rounded-full bg-white p-1 border border-gray-200" style="print-color-adjust: exact; -webkit-print-color-adjust: exact;">
+                    <h2 class="text-xl font-bold uppercase tracking-wider text-indigo-900">Bangladesh Army University of Science & Technology (BAUST)</h2>
+                    <p class="text-sm font-semibold text-gray-700">Department of ${batch.dept}</p>
+                    <p class="text-sm text-indigo-700 font-bold mt-1">Class Routine for ${batch.lt}, ${batch.name} - ${batch.section}</p>
+                    <p class="text-xs text-gray-500 mt-0.5">Section Capacity: ${batch.capacity} Students | Academic Session Timetable</p>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full baust-grid">
+                        <thead>
+                            <tr class="bg-indigo-900 text-white font-bold text-xs">
+                                <th class="p-2 border border-gray-600 w-24">Day / Time</th>
+            `;
+
+            SLOTS.forEach(slot => {
+                if (slot.isBreak) {
+                    html += `<th class="p-2 border border-gray-600 bg-amber-600 text-white w-20">10.55 AM -<br>11.30 AM</th>`;
+                } else {
+                    html += `<th class="p-2 border border-gray-600">${slot.label}</th>`;
+                }
+            });
+
+            html += `</tr></thead><tbody>`;
+
+            DAYS.forEach(day => {
+                html += `<tr><td class="font-bold bg-indigo-50 text-indigo-900 p-2 border border-gray-600">${day}</td>`;
+                let skipSlots = 0;
+
+                SLOTS.forEach(slot => {
+                    if (skipSlots > 0) {
+                        skipSlots--;
+                        return;
+                    }
+
+                    if (slot.isBreak) {
+                        html += `<td class="bg-amber-50 text-amber-900 font-bold text-xs border border-gray-600 uppercase tracking-widest">BREAK / PRAYER</td>`;
+                    } else {
+                        let entry = batchRoutine[day] && batchRoutine[day][slot.id];
+                        let colspanVal = 1;
+                        if (entry && entry.type === 'Sessional') {
+                            if ((slot.id === 0 || slot.id === 4) && 
+                                batchRoutine[day]?.[slot.id]?.courseId === batchRoutine[day]?.[slot.id + 1]?.courseId &&
+                                batchRoutine[day]?.[slot.id]?.courseId === batchRoutine[day]?.[slot.id + 2]?.courseId) {
+                                colspanVal = 3;
+                                skipSlots = 2;
+                            }
+                        }
+
+                        if (entry) {
+                            html += `
+                                <td ${colspanVal > 1 ? `colspan="${colspanVal}"` : ''} class="bg-purple-50 p-3 border border-gray-600 text-center">
+                                    <div class="font-bold text-indigo-900 text-xs">${entry.code}</div>
+                                    <div class="text-[11px] text-gray-800 font-medium leading-tight my-1">${entry.title}</div>
+                                    <div class="text-[11px] text-indigo-700 font-semibold">${entry.teachers}</div>
+                                    <div class="text-[10px] bg-indigo-100 text-indigo-900 rounded px-1.5 py-0.5 mt-1.5 inline-block font-bold">Room: ${entry.roomCode}</div>
+                                </td>
+                            `;
+                        } else {
+                            html += `<td class="text-gray-300 text-xs border border-gray-600">-</td>`;
+                        }
+                    }
+                });
+                html += `</tr>`;
+            });
+
+            html += `</tbody></table></div>`;
+
+            html += `
+                <div class="flex justify-between items-end mt-12 pt-8 text-xs font-semibold text-gray-700">
+                    <div>
+                        <p class="border-t border-gray-400 pt-1 px-4">Routine Coordinator, ${batch.dept}</p>
+                    </div>
+                    <div>
+                        <p class="border-t border-gray-400 pt-1 px-4">Head of the Department, ${batch.dept}</p>
+                        <p class="text-[10px] text-gray-500 font-normal">BAUST, Saidpur</p>
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function downloadRoutinePDF() {
+            const element = document.getElementById('public-routine-container');
+            let filename = `Routine_${selectedDept}_${selectedSemester}_${selectedSection}.pdf`;
+
+            const opt = {
+                margin:       0.2,
+                filename:     filename,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2 },
+                jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }
+            };
+
+            html2pdf().set(opt).from(element).save();
+        }
+
+        // ================= TEACHERS CRUD =================
+        function saveTeacher(e) {
+            e.preventDefault();
+            const id = document.getElementById('t-id').value;
+            const name = document.getElementById('t-name').value;
+            const code = document.getElementById('t-code').value.toUpperCase();
+            const designation = document.getElementById('t-designation').value;
+            const dept = document.getElementById('t-dept').value;
+
+            if (id) {
+                let t = teachers.find(x => x.id === id);
+                if (t) { Object.assign(t, { name, code, designation, dept }); showAlert('Teacher updated!'); }
+            } else {
+                teachers.push({ id: 't_' + Date.now(), name, code, designation, dept });
+                showAlert('Teacher saved to draft!');
+            }
+            saveLocalDraft(); resetTeacherForm(); renderTeachers();
+        }
+
+        function editTeacher(id) {
+            let t = teachers.find(x => x.id === id); if (!t) return;
+            document.getElementById('t-id').value = t.id;
+            document.getElementById('t-name').value = t.name;
+            document.getElementById('t-code').value = t.code;
+            document.getElementById('t-designation').value = t.designation;
+            document.getElementById('t-dept').value = t.dept;
+            document.getElementById('t-form-title').innerHTML = `<i class="fa-solid fa-pen-to-square mr-2"></i> Edit Teacher`;
+            document.getElementById('t-submit-btn').innerText = `Update Teacher`;
+            document.getElementById('t-cancel-btn').classList.remove('hidden');
+        }
+
+        function resetTeacherForm() {
+            document.getElementById('form-teacher').reset();
+            document.getElementById('t-id').value = '';
+            document.getElementById('t-form-title').innerHTML = `<i class="fa-solid fa-user-plus mr-2"></i> Add Teacher`;
+            document.getElementById('t-submit-btn').innerText = `Save Teacher`;
+            document.getElementById('t-cancel-btn').classList.add('hidden');
+        }
+
+        function deleteTeacher(id) {
+            teachers = teachers.filter(t => t.id !== id);
+            saveLocalDraft(); renderTeachers(); showAlert('Teacher deleted!', 'error');
+        }
+
+        function deleteAllTeachers() {
+            if (confirm("Delete all draft teachers?")) {
+                teachers = [];
+                saveLocalDraft(); renderTeachers();
+                showAlert('All teachers deleted!', 'error');
+            }
+        }
+
+        function renderTeachers() {
+            document.getElementById('list-teachers').innerHTML = teachers.map(t => `
+                <tr>
+                    <td class="p-3 font-bold text-indigo-700">${t.code}</td>
+                    <td class="p-3 font-medium">${t.name}</td>
+                    <td class="p-3 text-xs text-gray-600">${t.designation}</td>
+                    <td class="p-3 text-xs font-semibold">${t.dept}</td>
+                    <td class="p-3 text-right space-x-2">
+                        <button onclick="editTeacher('${t.id}')" class="text-amber-600 hover:text-amber-800"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button onclick="deleteTeacher('${t.id}')" class="text-rose-600 hover:text-rose-800"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // ================= ROOMS CRUD =================
+        function saveRoom(e) {
+            e.preventDefault();
+            const id = document.getElementById('r-id').value;
+            const code = document.getElementById('r-code').value;
+            const type = document.getElementById('r-type').value;
+            const dept = document.getElementById('r-dept').value;
+            const capacity = parseInt(document.getElementById('r-capacity').value);
+
+            if (id) {
+                let r = rooms.find(x => x.id === id);
+                if (r) { Object.assign(r, { code, type, dept, capacity }); showAlert('Room updated!'); }
+            } else {
+                rooms.push({ id: 'r_' + Date.now(), code, type, dept, capacity });
+                showAlert('Room saved!');
+            }
+            saveLocalDraft(); resetRoomForm(); renderRooms();
+        }
+
+        function editRoom(id) {
+            let r = rooms.find(x => x.id === id); if (!r) return;
+            document.getElementById('r-id').value = r.id;
+            document.getElementById('r-code').value = r.code;
+            document.getElementById('r-type').value = r.type;
+            document.getElementById('r-dept').value = r.dept;
+            document.getElementById('r-capacity').value = r.capacity;
+            document.getElementById('r-form-title').innerHTML = `<i class="fa-solid fa-pen-to-square mr-2"></i> Edit Room`;
+            document.getElementById('r-submit-btn').innerText = `Update Room`;
+            document.getElementById('r-cancel-btn').classList.remove('hidden');
+        }
+
+        function resetRoomForm() {
+            document.getElementById('form-room').reset();
+            document.getElementById('r-id').value = '';
+            document.getElementById('r-form-title').innerHTML = `<i class="fa-solid fa-door-open mr-2"></i> Add Room / Lab`;
+            document.getElementById('r-submit-btn').innerText = `Save Room`;
+            document.getElementById('r-cancel-btn').classList.add('hidden');
+        }
+
+        function deleteRoom(id) {
+            rooms = rooms.filter(r => r.id !== id);
+            saveLocalDraft(); renderRooms(); showAlert('Room deleted!', 'error');
+        }
+
+        function renderRooms() {
+            document.getElementById('list-rooms').innerHTML = rooms.map(r => `
+                <tr>
+                    <td class="p-3 font-bold text-indigo-700">${r.code}</td>
+                    <td class="p-3"><span class="px-2 py-1 text-xs rounded ${r.type === 'Theory' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'}">${r.type}</span></td>
+                    <td class="p-3 font-semibold text-xs">${r.dept}</td>
+                    <td class="p-3">${r.capacity} seats</td>
+                    <td class="p-3 text-right space-x-2">
+                        <button onclick="editRoom('${r.id}')" class="text-amber-600 hover:text-amber-800"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button onclick="deleteRoom('${r.id}')" class="text-rose-600 hover:text-rose-800"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // ================= BATCHES CRUD =================
+        function saveBatch(e) {
+            e.preventDefault();
+            const id = document.getElementById('b-id').value;
+            const dept = document.getElementById('b-dept').value;
+            const lt = document.getElementById('b-lt').value;
+            const name = document.getElementById('b-name').value;
+            const section = document.getElementById('b-section').value;
+            const capacity = parseInt(document.getElementById('b-capacity').value);
+
+            if (id) {
+                let b = batches.find(x => x.id === id);
+                if (b) { Object.assign(b, { dept, lt, name, section, capacity }); showAlert('Batch updated!'); }
+            } else {
+                batches.push({ id: 'b_' + Date.now(), dept, lt, name, section, capacity });
+                showAlert('Batch saved!');
+            }
+            saveLocalDraft(); resetBatchForm(); renderBatches();
+        }
+
+        function editBatch(id) {
+            let b = batches.find(x => x.id === id); if (!b) return;
+            document.getElementById('b-id').value = b.id;
+            document.getElementById('b-dept').value = b.dept;
+            document.getElementById('b-lt').value = b.lt;
+            document.getElementById('b-name').value = b.name;
+            document.getElementById('b-section').value = b.section;
+            document.getElementById('b-capacity').value = b.capacity;
+            document.getElementById('b-form-title').innerHTML = `<i class="fa-solid fa-pen-to-square mr-2"></i> Edit Batch`;
+            document.getElementById('b-submit-btn').innerText = `Update Batch`;
+            document.getElementById('b-cancel-btn').classList.remove('hidden');
+        }
+
+        function resetBatchForm() {
+            document.getElementById('form-batch').reset();
+            document.getElementById('b-id').value = '';
+            document.getElementById('b-form-title').innerHTML = `<i class="fa-solid fa-users mr-2"></i> Add Batch Section & Semester`;
+            document.getElementById('b-submit-btn').innerText = `Save Batch`;
+            document.getElementById('b-cancel-btn').classList.add('hidden');
+        }
+
+        function deleteBatch(id) {
+            batches = batches.filter(b => b.id !== id);
+            saveLocalDraft(); renderBatches(); showAlert('Batch deleted!', 'error');
+        }
+
+        function renderBatches() {
+            document.getElementById('list-batches').innerHTML = batches.map(b => `
+                <tr>
+                    <td class="p-3 font-bold text-indigo-700">${b.dept}</td>
+                    <td class="p-3 font-medium">${b.lt}</td>
+                    <td class="p-3">${b.name}</td>
+                    <td class="p-3 font-semibold text-indigo-900">${b.section}</td>
+                    <td class="p-3">${b.capacity} Students</td>
+                    <td class="p-3 text-right space-x-2">
+                        <button onclick="editBatch('${b.id}')" class="text-amber-600 hover:text-amber-800"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button onclick="deleteBatch('${b.id}')" class="text-rose-600 hover:text-rose-800"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // ================= COURSES CRUD =================
+        function autoAdjustCourseType() {
+            const credit = document.getElementById('c-credit').value;
+            const typeSelect = document.getElementById('c-type');
+            if (credit === '1.5' || credit === '0.75') typeSelect.value = 'Sessional';
+            else typeSelect.value = 'Theory';
+        }
+
+        function updateCourseBatchDropdown() {
+            const dept = document.getElementById('c-dept').value;
+            const filteredBatches = batches.filter(b => b.dept === dept);
+            document.getElementById('c-batch').innerHTML = filteredBatches.map(b => 
+                `<option value="${b.id}">${b.name} - ${b.lt} (${b.section})</option>`
+            ).join('');
+            renderTeacherCheckboxes();
+        }
+
+        function renderTeacherCheckboxes() {
+            const container = document.getElementById('teacher-checkboxes');
+            container.innerHTML = teachers.map(t => `
+                <label class="flex items-center space-x-2 text-xs cursor-pointer">
+                    <input type="checkbox" name="course-teachers" value="${t.id}" class="rounded text-indigo-600">
+                    <span class="font-bold text-indigo-900">${t.code}</span> - <span class="text-gray-600">${t.name} (${t.dept})</span>
+                </label>
+            `).join('');
+        }
+
+        function saveCourse(e) {
+            e.preventDefault();
+            const id = document.getElementById('c-id').value;
+            const dept = document.getElementById('c-dept').value;
+            const code = document.getElementById('c-code').value;
+            const title = document.getElementById('c-title').value;
+            const credit = parseFloat(document.getElementById('c-credit').value);
+            const type = document.getElementById('c-type').value;
+            const batchId = document.getElementById('c-batch').value;
+            const teacherIds = Array.from(document.querySelectorAll('input[name="course-teachers"]:checked')).map(cb => cb.value);
+
+            if (teacherIds.length === 0) {
+                showAlert('Please select at least one teacher.', 'error'); return;
+            }
+
+            if (id) {
+                let c = courses.find(x => x.id === id);
+                if (c) { Object.assign(c, { dept, code, title, credit, type, batchId, teacherIds }); showAlert('Course updated!'); }
+            } else {
+                courses.push({ id: 'c_' + Date.now(), dept, code, title, credit, type, batchId, teacherIds });
+                showAlert('Course saved!');
+            }
+            saveLocalDraft(); resetCourseForm(); renderCourses();
+        }
+
+        function editCourse(id) {
+            let c = courses.find(x => x.id === id); if (!c) return;
+            document.getElementById('c-id').value = c.id;
+            document.getElementById('c-dept').value = c.dept;
+            updateCourseBatchDropdown();
+            document.getElementById('c-code').value = c.code;
+            document.getElementById('c-title').value = c.title;
+            document.getElementById('c-credit').value = c.credit;
+            document.getElementById('c-type').value = c.type;
+            document.getElementById('c-batch').value = c.batchId;
+
+            setTimeout(() => {
+                document.querySelectorAll('input[name="course-teachers"]').forEach(cb => {
+                    if (c.teacherIds.includes(cb.value)) cb.checked = true;
+                });
+            }, 50);
+
+            document.getElementById('c-form-title').innerHTML = `<i class="fa-solid fa-pen-to-square mr-2"></i> Edit Course`;
+            document.getElementById('c-submit-btn').innerText = `Update Course`;
+            document.getElementById('c-cancel-btn').classList.remove('hidden');
+        }
+
+        function resetCourseForm() {
+            document.getElementById('form-course').reset();
+            document.getElementById('c-id').value = '';
+            document.getElementById('c-form-title').innerHTML = `<i class="fa-solid fa-book mr-2"></i> Add Course / Lab`;
+            document.getElementById('c-submit-btn').innerText = `Save Course`;
+            document.getElementById('c-cancel-btn').classList.add('hidden');
+            renderTeacherCheckboxes();
+        }
+
+        function deleteCourse(id) {
+            courses = courses.filter(c => c.id !== id);
+            saveLocalDraft(); renderCourses(); showAlert('Course deleted!', 'error');
+        }
+
+        function deleteAllCourses() {
+            if (confirm("Delete all courses?")) {
+                courses = [];
+                saveLocalDraft(); renderCourses();
+                showAlert('All courses deleted!', 'error');
+            }
+        }
+
+        function renderCourses() {
+            document.getElementById('list-courses').innerHTML = courses.map(c => {
+                let tCodes = c.teacherIds.map(tid => teachers.find(t => t.id === tid)?.code).filter(Boolean).join(', ');
+                let b = batches.find(x => x.id === c.batchId);
+                return `
+                    <tr>
+                        <td class="p-3 font-bold text-indigo-700">${c.code}</td>
+                        <td class="p-3 font-medium">${c.title}</td>
+                        <td class="p-3">${c.credit}</td>
+                        <td class="p-3"><span class="px-2 py-1 text-xs rounded ${c.type === 'Theory' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'}">${c.type}</span></td>
+                        <td class="p-3 text-xs font-semibold">${b ? `${b.name} (${b.section})` : '-'}</td>
+                        <td class="p-3 font-bold text-indigo-600 text-xs">${tCodes}</td>
+                        <td class="p-3 text-right space-x-2">
+                            <button onclick="editCourse('${c.id}')" class="text-amber-600 hover:text-amber-800"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button onclick="deleteCourse('${c.id}')" class="text-rose-600 hover:text-rose-800"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function updateAllDropdowns() {
+            updateCourseBatchDropdown();
+            onBuilderDeptChange();
+        }
+
+        // ================= ADMIN BUILDER ROUTINE =================
+        function onBuilderDeptChange() {
+            const dept = document.getElementById('builder-dept').value;
+            const filteredBatches = batches.filter(b => b.dept === dept);
+            const batchSelect = document.getElementById('builder-batch');
+
+            if (filteredBatches.length === 0) {
+                batchSelect.innerHTML = `<option value="">No Batch Section Found</option>`;
+            } else {
+                batchSelect.innerHTML = filteredBatches.map(b => 
+                    `<option value="${b.id}">${b.name} - ${b.lt} (${b.section})</option>`
+                ).join('');
+            }
+            renderAdminBuilderRoutine();
+        }
+
+        function populateAssignerOptions(selectedBatch) {
+            const courseSelect = document.getElementById('assign-course');
+            const roomSelect = document.getElementById('assign-room');
+
+            const filteredCourses = courses.filter(c => c.batchId === selectedBatch.id);
+            courseSelect.innerHTML = filteredCourses.map(c => 
+                `<option value="${c.id}">${c.code} - ${c.title} (${c.type}) [Cr: ${c.credit}]</option>`
+            ).join('');
+
+            roomSelect.innerHTML = rooms.map(r => 
+                `<option value="${r.id}">${r.code} (${r.type}, ${r.dept}) [Capacity: ${r.capacity}]</option>`
+            ).join('');
+        }
+
+        function manualAssignSlot() {
+            if (!isAdminLoggedIn) return;
+            const batchId = document.getElementById('builder-batch').value;
+            if (!batchId) { showAlert('Please select a valid Batch Section first.', 'error'); return; }
+
+            const batch = batches.find(b => b.id === batchId);
+            const day = document.getElementById('assign-day').value;
+            const slotVal = document.getElementById('assign-slot').value;
+            const courseId = document.getElementById('assign-course').value;
+            const roomId = document.getElementById('assign-room').value;
+
+            if (!courseId || !roomId) {
+                showAlert('Please make sure Course and Room are selected.', 'error'); return;
+            }
+
+            const course = courses.find(c => c.id === courseId);
+            const room = rooms.find(r => r.id === roomId);
+
+            if (batch.capacity > room.capacity) {
+                showAlert(`ERROR: Section Capacity (${batch.capacity}) exceeds Room Capacity (${room.capacity})!`, 'error');
+                return;
+            }
+
+            let targetSlots = [];
+            if (slotVal === 'LAB_MORNING') targetSlots = [0, 1, 2];
+            else if (slotVal === 'LAB_AFTERNOON') targetSlots = [4, 5, 6];
+            else targetSlots = [parseInt(slotVal)];
+
+            if (course.type === 'Sessional' && !['LAB_MORNING', 'LAB_AFTERNOON'].includes(slotVal)) {
+                showAlert('ERROR: Sessional / Lab courses must be scheduled in a 3-hour block.', 'error');
+                return;
+            }
+
+            if (!routineMap[batchId]) routineMap[batchId] = {};
+            if (!routineMap[batchId][day]) routineMap[batchId][day] = {};
+
+            let tCodes = course.teacherIds.map(tid => teachers.find(t => t.id === tid)?.code).filter(Boolean).join(', ');
+
+            targetSlots.forEach(sId => {
+                routineMap[batchId][day][sId] = {
+                    courseId: course.id,
+                    code: course.code,
+                    title: course.title,
+                    type: course.type,
+                    roomId: room.id,
+                    roomCode: room.code,
+                    teacherIds: course.teacherIds,
+                    teachers: tCodes
+                };
+            });
+
+            saveLocalDraft();
+            renderAdminBuilderRoutine();
+            showAlert(`Class assigned successfully! Click 'Publish' to update public view.`);
+        }
+
+        function removeRoutineEntry(day, slotId) {
+            if (!isAdminLoggedIn) return;
+            const batchId = document.getElementById('builder-batch').value;
+            if (routineMap[batchId]?.[day]?.[slotId]) {
+                if ((slotId === 0 || slotId === 4) && routineMap[batchId][day][slotId]?.type === 'Sessional') {
+                    delete routineMap[batchId][day][slotId];
+                    delete routineMap[batchId][day][slotId + 1];
+                    delete routineMap[batchId][day][slotId + 2];
+                } else {
+                    delete routineMap[batchId][day][slotId];
+                }
+                saveLocalDraft();
+                renderAdminBuilderRoutine();
+                showAlert('Class entry removed from draft.', 'error');
+            }
+        }
+
+        function clearBatchRoutine() {
+            if (!isAdminLoggedIn) return;
+            const batchId = document.getElementById('builder-batch').value;
+            if (!batchId) return;
+            const batch = batches.find(b => b.id === batchId);
+            if (confirm(`Clear draft routine for ${batch.name} (${batch.section})?`)) {
+                if (routineMap[batchId]) {
+                    delete routineMap[batchId];
+                    saveLocalDraft();
+                    renderAdminBuilderRoutine();
+                    showAlert('Routine cleared from draft.', 'error');
+                }
+            }
+        }
+
+        function renderAdminBuilderRoutine() {
+            const container = document.getElementById('admin-routine-container');
+            const batchId = document.getElementById('builder-batch').value;
+            let batch = batches.find(b => b.id === batchId);
+
+                if (!batch) {
+                container.innerHTML = `
+                    <div class="text-center py-10 text-gray-400">
+                        <p class="text-lg">Select Department and Section above to view and edit draft routine.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            populateAssignerOptions(batch);
+            let batchRoutine = routineMap[batchId] || {};
+
+            let html = `
+                <div class="text-center mb-6">
+                    <h2 class="text-xl font-bold uppercase tracking-wider text-indigo-950">[Draft] BAUST - Department of ${batch.dept}</h2>
+                    <p class="text-sm font-semibold text-gray-700">Class Routine for ${batch.lt}, ${batch.name} - ${batch.section}</p>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full baust-grid">
+                        <thead>
+                            <tr class="bg-indigo-900 text-white font-bold text-xs">
+                                <th class="p-2 border border-gray-600 w-24">Day / Time</th>
+            `;
+
+            SLOTS.forEach(slot => {
+                if (slot.isBreak) {
+                    html += `<th class="p-2 border border-gray-600 bg-amber-600 text-white w-20">10.55 AM -<br>11.30 AM</th>`;
+                } else {
+                    html += `<th class="p-2 border border-gray-600">${slot.label}</th>`;
+                }
+            });
+
+            html += `</tr></thead><tbody>`;
+
+            DAYS.forEach(day => {
+                html += `<tr><td class="font-bold bg-indigo-50 text-indigo-900 p-2 border border-gray-600">${day}</td>`;
+                let skipSlots = 0;
+
+                SLOTS.forEach(slot => {
+                    if (skipSlots > 0) {
+                        skipSlots--;
+                        return;
+                    }
+
+                    if (slot.isBreak) {
+                        html += `<td class="bg-amber-50 text-amber-900 font-bold text-xs border border-gray-600 uppercase tracking-widest">BREAK / PRAYER</td>`;
+                    } else {
+                        let entry = batchRoutine[day] && batchRoutine[day][slot.id];
+                        let colspanVal = 1;
+                        if (entry && entry.type === 'Sessional') {
+                            if ((slot.id === 0 || slot.id === 4) && 
+                                batchRoutine[day]?.[slot.id]?.courseId === batchRoutine[day]?.[slot.id + 1]?.courseId &&
+                                batchRoutine[day]?.[slot.id]?.courseId === batchRoutine[day]?.[slot.id + 2]?.courseId) {
+                                colspanVal = 3;
+                                skipSlots = 2;
+                            }
+                        }
+
+                        if (entry) {
+                            html += `
+                                <td ${colspanVal > 1 ? `colspan="${colspanVal}"` : ''} class="bg-purple-50 p-3 border border-gray-600 relative group text-center">
+                                    <div class="font-bold text-indigo-900 text-xs">${entry.code}</div>
+                                    <div class="text-[11px] text-gray-800 font-medium leading-tight my-1">${entry.title}</div>
+                                    <div class="text-[11px] text-indigo-700 font-semibold">${entry.teachers}</div>
+                                    <div class="text-[10px] bg-indigo-100 text-indigo-900 rounded px-1.5 py-0.5 mt-1.5 inline-block font-bold">Room: ${entry.roomCode}</div>
+                                    <button onclick="removeRoutineEntry('${day}',${slot.id})" class="absolute top-1 right-1 text-rose-500 hover:text-rose-800 text-sm" title="Remove"><i class="fa-solid fa-circle-xmark"></i></button>
+                                </td>
+                            `;
+                        } else {
+                            html += `<td class="text-gray-300 text-xs border border-gray-600">-</td>`;
+                        }
+                    }
+                });
+                html += `</tr>`;
+            });
+
+            html += `</tbody></table></div>`;
+            container.innerHTML = html;
+        }
+    </script>
+</body>
+</html>
